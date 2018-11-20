@@ -38,6 +38,7 @@ RUN mkdir -p /opt/yarn \
     && tar -xzf hadoop.tar.gz -C /opt/yarn  && rm hadoop.tar.gz \
     && ln -s /opt/yarn/$HADOOP_PACKAGE /opt/hadoop
 
+ENV HADOOP_HOME=/opt/hadoop/
 
 RUN groupadd hadoop \
     && useradd -g hadoop yarn \ 
@@ -46,6 +47,7 @@ RUN groupadd hadoop \
     && mkdir -p /var/data/hadoop/hdfs/nn \
     && mkdir -p /var/data/hadoop/hdfs/snn \
     && mkdir /var/data/hadoop/hdfs/dn \
+    && chown -R hdfs:hadoop /opt/hadoop \
     && chown hdfs:hadoop /var/data/hadoop/hdfs \
     && mkdir -p /var/log/hadoop/logs \
     && chmod 755 /var/log/hadoop/logs \
@@ -99,17 +101,25 @@ ENV HADOOP_YARN_HOME $HADOOP_HOME
 ENV HADOOP_CONF_DIR $HADOOP_HOME/etc/hadoop
 ENV YARN_CONF_DIR $HADOOP_PREFIX/etc/hadoop
 
+COPY . /home/hdfs/
+
+#RUN cp /home/hdfs/core-site.xml /opt/hadoop/etc/hadoop/core-site.xml 
+#    && mv /home/hdfs/hdfs-site.xml /opt/hadoop/etc/hadoop/hdfs-site.xml \
+#    && mv /home/hdfs/mapred-site.xml /opt/hadoop/etc/hadoop/mapred-site.xml \
+#    && mv /home/hdfs/yarn-site.xml /opt/hadoop/etc/hadoop/yarn-site.xml \
+#    && mv /home/hdfs/slaves /opt/hadoop/etc/hadoop/slaves
+
+# add default config files which has one master and three slaves
 ADD core-site.xml $HADOOP_HOME/etc/hadoop/core-site.xml
 ADD hdfs-site.xml $HADOOP_HOME/etc/hadoop/hdfs-site.xml
 ADD mapred-site.xml $HADOOP_HOME/etc/hadoop/mapred-site.xml
 ADD yarn-site.xml $HADOOP_HOME/etc/hadoop/yarn-site.xml
 ADD slaves $HADOOP_HOME/etc/hadoop/slaves
-
 #ADD hadoop-env.sh $HADOOP_HOME/etc/hadoop/hadoop-env.sh 
 
 # update JAVA_HOME and HADOOP_CONF_DIR in hadoop-env.sh
-RUN sed -i "/^export JAVA_HOME/ s:.*:export JAVA_HOME=${JAVA_HOME}\nexport HADOOP_HOME=${HADOOP_HOME}\nexport HADOOP_PREFIX=${HADOOP_PREFIX}:"  /opt/hadoop/etc/hadoop/hadoop-env.sh
-RUN sed -i '/^export HADOOP_CONF_DIR/ s:.*:export HADOOP_CONF_DIR=$HADOOP_PREFIX/etc/hadoop/:' /opt/hadoop/etc/hadoop/hadoop-env.sh
+#RUN sed -i "/^export JAVA_HOME/ s:.*:export JAVA_HOME=${JAVA_HOME}\nexport HADOOP_HOME=${HADOOP_HOME}\nexport HADOOP_PREFIX=${HADOOP_PREFIX}:"  /opt/hadoop/etc/hadoop/hadoop-env.sh
+RUN sed -i '/^export HADOOP_CONF_DIR/ s:.*:export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop/:' /opt/hadoop/etc/hadoop/hadoop-env.sh
 
 EXPOSE 10022:22
 CMD ["/usr/sbin/sshd", "-D"]
