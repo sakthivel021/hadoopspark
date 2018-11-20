@@ -12,24 +12,32 @@ services:
       - "7077:7077"
       - "4040:4040"
       - "8020:8020"
+      - "10020:22"
     volumes:
       - "opt-vol:/opt"
+    links:
+      - "slave1:hadoop-slave1"
+      - "slave2:hadoop-slave2"
+      - "slave3:hadoop-slave3"
+
     command: $HADOOP_HOME/sbin/stop-yarn.sh
     command: $HADOOP_HOME/sbin/stop-dfs.sh
     command: rm -rf /tmp
     command: $HADOOP_HOME/sbin/start-dfs.sh
     command: $HADDOP_HOME/sbin/start-yarn.sh
     command: /usr/sbin/sshd -D
-    networks:
-      - hadoop
+ #   networks:
+ #     - hadoop
   slave1:
     build: .
     hostname: hadoop-slave1
     container_name: datanode1
     volumes:
       - "opt-vol:/opt"
-    networks:
-      - hadoop
+    ports:
+      - "10021:22"
+  #  networks:
+  #    - hadoop
     command: /usr/sbin/sshd -D
         
   slave2:
@@ -38,8 +46,10 @@ services:
     container_name: datanode2
     volumes:
       - "opt-vol:/opt"
-    networks:
-      - hadoop
+    ports:
+      - "10022:22"
+#    networks:
+ #     - hadoop
     command: /usr/sbin/sshd -D
   slave3:
     build: . 
@@ -47,12 +57,12 @@ services:
     container_name: datanode3
     volumes:
       - "opt-vol:/opt"
-    networks:
-      - hadoop
+    #networks:
+    #  - hadoop
+    ports:
+      - "10023:22"
     command: /usr/sbin/sshd -D
-    networks:
-      - hadoop
-networks:
-  hadoop:
+#networks:
+#  hadoop:
 volumes:
   opt-vol:
