@@ -1,0 +1,58 @@
+version: "3"
+services:
+  master:
+    build: .
+    hostname: hadoop-master
+    container_name: namenode
+    ports:
+      - "50020:50020"
+      - "50070:50070"
+      - "8080:8080"
+      - "8081:8081"
+      - "7077:7077"
+      - "4040:4040"
+      - "8020:8020"
+    volumes:
+      - "opt-vol:/opt"
+    command: $HADOOP_HOME/sbin/stop-yarn.sh
+    command: $HADOOP_HOME/sbin/stop-dfs.sh
+    command: rm -rf /tmp
+    command: $HADOOP_HOME/sbin/start-dfs.sh
+    command: $HADDOP_HOME/sbin/start-yarn.sh
+    command: /usr/sbin/sshd -D
+    networks:
+      - hadoop
+  slave1:
+    build: .
+    hostname: hadoop-slave1
+    container_name: datanode1
+    volumes:
+      - "opt-vol:/opt"
+    networks:
+      - hadoop
+    command: /usr/sbin/sshd -D
+        
+  slave2:
+    build: .
+    hostname: hadoop-slave2
+    container_name: datanode2
+    volumes:
+      - "opt-vol:/opt"
+    networks:
+      - hadoop
+    command: /usr/sbin/sshd -D
+  slave3:
+    build: . 
+    hostname: hadoop-slave3
+    container_name: datanode3
+    volumes:
+      - "opt-vol:/opt"
+    networks:
+      - hadoop
+    command: /usr/sbin/sshd -D
+    networks:
+      - hadoop
+networks:
+  hadoop:
+volumes:
+  opt-vol:
