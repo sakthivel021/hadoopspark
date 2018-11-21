@@ -25,10 +25,10 @@ RUN echo "export VISIBLE=now" >> /etc/profile
 
 run yum install -y java-1.8.0-openjdk-devel \
     && java -version \ 
-    && rpm -qa | grep jdk \ 
-    && wget https://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm \ 
-    && rpm -Uvh epel-release*rpm \
-    && yum install -y pdsh 
+    && rpm -qa | grep jdk  
+ #   && wget https://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm \ 
+  #  && rpm -Uvh epel-release*rpm \
+  #  && yum install -y pdsh 
 
 
 #install Hadoop,Spark
@@ -48,6 +48,7 @@ RUN groupadd hadoop \
     && mkdir -p /var/data/hadoop/hdfs/snn \
     && mkdir /var/data/hadoop/hdfs/dn \
     && chown -R hdfs:hadoop /opt/hadoop \
+    && chown -R hdfs:hadoop /var/data/ \
     && chown hdfs:hadoop /var/data/hadoop/hdfs \
     && mkdir -p /var/log/hadoop/logs \
     && chmod 755 /var/log/hadoop/logs \
@@ -85,6 +86,7 @@ EXPOSE 8088
 RUN  ln -s $HADOOP_HOME/etc/hadoop $HADOOP_HOME/conf \
     && echo "export SPARK_HOME=/opt/spark" >> /etc/profile \
     && echo "export  HADOOP_HOME=/opt/hadoop" >> /etc/profile \
+    && echo "export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin" >> /etc/profile \
     && echo "export  JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk.x86_64 " >> /etc/profile \
     && echo "export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk.x86_64" >> /opt/hadoop/etc/hadoop/hadoop-env.sh \
     && echo "export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop" >> /opt/hadoop/etc/hadoop/hadoop-env.sh \
