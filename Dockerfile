@@ -48,8 +48,10 @@ RUN groupadd hadoop \
     && mkdir -p /var/data/hadoop/hdfs/snn \
     && mkdir /var/data/hadoop/hdfs/dn \
     && chown -R hdfs:hadoop /opt/hadoop \
+    && chown -R hdfs:hadoop /opt/yarn \
     && chown -R hdfs:hadoop /var/data/ \
-    && chown hdfs:hadoop /var/data/hadoop/hdfs \
+    && chown -R hdfs:hadoop /var/data/ \
+    && chmod 777 /tmp \
     && mkdir -p /var/log/hadoop/logs \
     && chmod 755 /var/log/hadoop/logs \
     && mkdir $HADOOP_HOME/logs \
@@ -88,6 +90,7 @@ RUN  ln -s $HADOOP_HOME/etc/hadoop $HADOOP_HOME/conf \
     && echo "export  HADOOP_HOME=/opt/hadoop" >> /etc/profile \
     && echo "export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin" >> /etc/profile \
     && echo "export  JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk.x86_64 " >> /etc/profile \
+    && echo "export HADOOP_HOME=/opt/hadoop/" >> /opt/hadoop/etc/hadoop/hadoop-env.sh \
     && echo "export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk.x86_64" >> /opt/hadoop/etc/hadoop/hadoop-env.sh \
     && echo "export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop" >> /opt/hadoop/etc/hadoop/hadoop-env.sh \
     && echo "export HADOOP_OPTS=-Djava.net.preferIPv4Stack=true" >> /opt/hadoop/etc/hadoop/hadoop-env.sh \
@@ -103,6 +106,7 @@ ENV HADOOP_YARN_HOME $HADOOP_HOME
 ENV HADOOP_CONF_DIR $HADOOP_HOME/etc/hadoop
 ENV YARN_CONF_DIR $HADOOP_PREFIX/etc/hadoop
 
+USER hdfs
 COPY . /home/hdfs/
 
 #RUN cp /home/hdfs/core-site.xml /opt/hadoop/etc/hadoop/core-site.xml 
@@ -124,6 +128,8 @@ ADD slaves $HADOOP_HOME/etc/hadoop/slaves
 RUN sed -i '/^export HADOOP_CONF_DIR/ s:.*:export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop/:' /opt/hadoop/etc/hadoop/hadoop-env.sh
 
 EXPOSE 10022:22
+#ENTRYPOINT  [ sh /home/hdfs/deploy_config.sh]
+USER root
 CMD ["/usr/sbin/sshd", "-D"]
 
 

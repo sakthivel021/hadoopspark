@@ -23,13 +23,14 @@ services:
       - "slave1:hadoop-slave1"
       - "slave2:hadoop-slave2"
       - "slave3:hadoop-slave3"
-    command: su -hdfs -c 'sh /home/hdfs/deploy_config.sh'
-    command: $HADOOP_HOME/sbin/stop-yarn.sh
-    command: $HADOOP_HOME/sbin/stop-dfs.sh
-    command: rm -rf /tmp
-    command: $HADOOP_HOME/sbin/start-dfs.sh
-    command: $HADDOP_HOME/sbin/start-yarn.sh
-    command: /usr/sbin/sshd -D
+   # command: 
+  #    - /home/hdfs/deploy_config.sh
+ #     - /opt/hadoop/sbin/stop-yarn.sh
+ #     - /opt/hadoop/sbin/stop-dfs.sh
+ #     - rm -rf /tmp
+ #     - /opt/hadoop/sbin/start-dfs.sh
+ #     - /opt/hadoop/sbin/start-yarn.sh
+    #  - /usr/sbin/sshd -D
     networks:
       - hadoop
   slave1:
@@ -43,7 +44,7 @@ services:
       - "50090:50090"
     networks:
       - hadoop
-    command: /usr/sbin/sshd -D
+ #   command: /usr/sbin/sshd -D
     external_links:
       - "master:hadoop-master"
       - "slave2:hadoop-slave2"
@@ -64,7 +65,7 @@ services:
 
     networks:
       - hadoop
-    command: /usr/sbin/sshd -D
+#    command: /usr/sbin/sshd -D
   slave3:
     build: . 
     hostname: hadoop-slave3.domain
@@ -80,7 +81,7 @@ services:
       - "slave1:hadoop-slave1"
       - "slave2:hadoop-slave2"
 
-    command: /usr/sbin/sshd -D
+   # command: /usr/sbin/sshd -D
 networks:
   hadoop:
 volumes:
