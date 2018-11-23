@@ -2,56 +2,86 @@ version: "3"
 services:
   master:
     build: .
-    hostname: hadoop-master
+    hostname: hadoop-master.domain
     container_name: namenode
     ports:
       - "50020:50020"
       - "50070:50070"
       - "8080:8080"
+      - "8088:8088"
       - "8081:8081"
       - "7077:7077"
       - "4040:4040"
       - "8020:8020"
+      - "10021:22"
+      - "19888:19888"
+      - "10020:10020"
+
     volumes:
       - "opt-vol:/opt"
-    command: $HADOOP_HOME/sbin/stop-yarn.sh
-    command: $HADOOP_HOME/sbin/stop-dfs.sh
-    command: rm -rf /tmp
-    command: $HADOOP_HOME/sbin/start-dfs.sh
-    command: $HADDOP_HOME/sbin/start-yarn.sh
-    command: /usr/sbin/sshd -D
+    links:
+      - "slave1:hadoop-slave1"
+      - "slave2:hadoop-slave2"
+      - "slave3:hadoop-slave3"
+   # command: 
+  #    - /home/hdfs/deploy_config.sh
+ #     - /opt/hadoop/sbin/stop-yarn.sh
+ #     - /opt/hadoop/sbin/stop-dfs.sh
+ #     - rm -rf /tmp
+ #     - /opt/hadoop/sbin/start-dfs.sh
+ #     - /opt/hadoop/sbin/start-yarn.sh
+    #  - /usr/sbin/sshd -D
     networks:
       - hadoop
   slave1:
     build: .
-    hostname: hadoop-slave1
+    hostname: hadoop-slave1.domain
     container_name: datanode1
     volumes:
       - "opt-vol:/opt"
+    ports:
+      - "10022:22"
+      - "50090:50090"
     networks:
       - hadoop
-    command: /usr/sbin/sshd -D
+ #   command: /usr/sbin/sshd -D
+    external_links:
+      - "master:hadoop-master"
+      - "slave2:hadoop-slave2"
+      - "slave3:hadoop-slave3"
         
   slave2:
     build: .
-    hostname: hadoop-slave2
+    hostname: hadoop-slave2.domain
     container_name: datanode2
     volumes:
       - "opt-vol:/opt"
+    ports:
+      - "10023:22"
+    external_links:
+      - "master:hadoop-master"
+      - "slave1:hadoop-slave1"
+      - "slave3:hadoop-slave3"
+
     networks:
       - hadoop
-    command: /usr/sbin/sshd -D
+#    command: /usr/sbin/sshd -D
   slave3:
     build: . 
-    hostname: hadoop-slave3
+    hostname: hadoop-slave3.domain
     container_name: datanode3
     volumes:
       - "opt-vol:/opt"
     networks:
       - hadoop
-    command: /usr/sbin/sshd -D
-    networks:
-      - hadoop
+    ports:
+      - "10024:22"
+    external_links:
+      - "master:hadoop-master"
+      - "slave1:hadoop-slave1"
+      - "slave2:hadoop-slave2"
+
+   # command: /usr/sbin/sshd -D
 networks:
   hadoop:
 volumes:
