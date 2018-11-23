@@ -130,7 +130,7 @@ RUN sed -i '/^export HADOOP_CONF_DIR/ s:.*:export HADOOP_CONF_DIR=$HADOOP_HOME/e
 EXPOSE 10022:22
 #ENTRYPOINT  [ sh /home/hdfs/deploy_config.sh]
 USER root
-CMD ["/usr/sbin/sshd", "-D"]
+#CMD ["/usr/sbin/sshd", "-D"]
 
 
 
