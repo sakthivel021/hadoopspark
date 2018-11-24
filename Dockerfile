@@ -5,56 +5,47 @@ ENV SPARK_VERSION 2.4.0
 ENV HADOOP_VERSION 2.7.4
 ENV HADOOP_PACKAGE hadoop-$HADOOP_VERSION
 
+ENV NOTVISIBLE "in users profile"
+ENV HADOOP_HOME=/opt/hadoop/
 ENV SPARK_PACKAGE spark-${SPARK_VERSION}-bin-hadoop2.7
 run yum install -y openssh-server wget java openssh-clients vim \
     && cat /etc/redhat-release \
     && service sshd start \
     && chkconfig sshd on \
     && echo 'root:$1$NFUWV7nM$L2G0.R82dulmo1m7Szobn/' | chpasswd -e \
-    && sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config 
-
+    && sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
 # SSH login fix. Otherwise user is kicked off after login
-RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+    && sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd \
 #    && systemctl enable sshd \
 #    && systemctl start  sshd
 
-ENV NOTVISIBLE "in users profile"
-RUN echo "export VISIBLE=now" >> /etc/profile 
-
+    && echo "export VISIBLE=now" >> /etc/profile \
 #install Java,Pdsh 
-
-run yum install -y java-1.8.0-openjdk-devel \
+    && yum install -y java-1.8.0-openjdk-devel \
     && java -version \ 
-    && rpm -qa | grep jdk  
+    && rpm -qa | grep jdk  \
  #   && wget https://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm \ 
   #  && rpm -Uvh epel-release*rpm \
   #  && yum install -y pdsh 
-
-
 #install Hadoop,Spark
-
-RUN mkdir -p /opt/yarn \ 
+    && mkdir -p /opt/yarn \ 
     && wget -O hadoop.tar.gz https://archive.apache.org/dist/hadoop/core/hadoop-2.7.4/hadoop-2.7.4.tar.gz \ 
     && tar -xzf hadoop.tar.gz -C /opt/yarn  && rm hadoop.tar.gz \
-    && ln -s /opt/yarn/$HADOOP_PACKAGE /opt/hadoop
-
-ENV HADOOP_HOME=/opt/hadoop/
-
-RUN groupadd hadoop \
+    && ln -s /opt/yarn/$HADOOP_PACKAGE /opt/hadoop \
+    && groupadd hadoop \
     && useradd -g hadoop yarn \ 
     && useradd -g hadoop hdfs \
     && useradd -g hadoop mapred \
     && mkdir -p /var/data/hadoop/hdfs/nn \
     && mkdir -p /var/data/hadoop/hdfs/snn \
     && mkdir /var/data/hadoop/hdfs/dn \
+    && mkdir $HADOOP_HOME/logs \
     && chown -R hdfs:hadoop /opt/hadoop \
     && chown -R hdfs:hadoop /opt/yarn \
-    && chown -R hdfs:hadoop /var/data/ \
     && chown -R hdfs:hadoop /var/data/ \
     && chmod 777 /tmp \
     && mkdir -p /var/log/hadoop/logs \
     && chmod 755 /var/log/hadoop/logs \
-    && mkdir $HADOOP_HOME/logs \
     && chown yarn:hadoop /var/log/hadoop/logs -R \
     && echo 'hdfs:$1$HMPEwAI3$.ToAzPVH2ijXi8weK8aJM0' | chpasswd -e \
     && echo 'yarn:$1$P9N9Q59u$ikIL28z4.y0fmP8D5qiCM1' | chpasswd -e \
@@ -68,9 +59,8 @@ RUN  ssh-keygen -q -N "" -t rsa -f /home/hdfs/.ssh/id_rsa \
     && cp /home/hdfs/.ssh/id_rsa.pub /home/hdfs/.ssh/authorized_keys
 USER root
 RUN yum install -y wget \ 
-    && wget -O spark.tar.gz http://apache.volia.net/spark/spark-2.4.0/spark-2.4.0-bin-hadoop2.7.tgz
-
-RUN mkdir -p /opt/ \
+    && wget -O spark.tar.gz http://apache.volia.net/spark/spark-2.4.0/spark-2.4.0-bin-hadoop2.7.tgz \ 
+    && mkdir -p /opt/ \
     && tar xvf spark.tar.gz -C /opt/ \
         && ln -s /opt/$SPARK_PACKAGE /opt/spark \
             &&mkdir /var/log/spark \
@@ -130,7 +120,7 @@ RUN sed -i '/^export HADOOP_CONF_DIR/ s:.*:export HADOOP_CONF_DIR=$HADOOP_HOME/e
 EXPOSE 10022:22
 #ENTRYPOINT  [ sh /home/hdfs/deploy_config.sh]
 USER root
-#CMD ["/usr/sbin/sshd", "-D"]
+CMD ["/usr/sbin/sshd", "-D"]
 
 
 
