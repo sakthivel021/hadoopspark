@@ -2,7 +2,7 @@ version: "3"
 services:
   master:
     build: .
-    hostname: hadoop-master.domain
+    hostname: hadoop-master
     container_name: namenode
     ports:
       - "50020:50020"
@@ -16,6 +16,7 @@ services:
       - "10021:22"
       - "19888:19888"
       - "10020:10020"
+      - "8030-8050"
 
     volumes:
       - "opt-vol:/opt"
@@ -35,13 +36,14 @@ services:
       - hadoop
   slave1:
     build: .
-    hostname: hadoop-slave1.domain
+    hostname: hadoop-slave1
     container_name: datanode1
     volumes:
       - "opt-vol:/opt"
     ports:
       - "10022:22"
       - "50090:50090"
+      - "8030-8050"
     networks:
       - hadoop
  #   command: /usr/sbin/sshd -D
@@ -52,12 +54,13 @@ services:
         
   slave2:
     build: .
-    hostname: hadoop-slave2.domain
+    hostname: hadoop-slave2
     container_name: datanode2
     volumes:
       - "opt-vol:/opt"
     ports:
       - "10023:22"
+      - "8030-8050"
     external_links:
       - "master:hadoop-master"
       - "slave1:hadoop-slave1"
@@ -68,7 +71,7 @@ services:
 #    command: /usr/sbin/sshd -D
   slave3:
     build: . 
-    hostname: hadoop-slave3.domain
+    hostname: hadoop-slave3
     container_name: datanode3
     volumes:
       - "opt-vol:/opt"
@@ -76,6 +79,7 @@ services:
       - hadoop
     ports:
       - "10024:22"
+      - "8030-8050"
     external_links:
       - "master:hadoop-master"
       - "slave1:hadoop-slave1"
