@@ -1,11 +1,12 @@
 FROM centos:6
 volume opt-vol:/opt
 ENV SPARK_VERSION 2.4.0
-ENV HADOOP_VERSION 2.4.0
+ENV HADOOP_VERSION 2.7.4
 ENV HADOOP_PACKAGE hadoop-$HADOOP_VERSION
 
 ENV NOTVISIBLE "in users profile"
 ENV HADOOP_HOME=/opt/hadoop/
+ENV HADOOP_PREFIX=/opt/hadoop
 ENV SPARK_PACKAGE spark-${SPARK_VERSION}-bin-hadoop2.7
 run yum install -y openssh-server wget java openssh-clients vim \
     && cat /etc/redhat-release \
@@ -28,7 +29,7 @@ run yum install -y openssh-server wget java openssh-clients vim \
   #  && yum install -y pdsh 
 #install Hadoop,Spark
     && mkdir -p /opt/yarn \ 
-    && wget -O hadoop.tar.gz https://archive.apache.org/dist/hadoop/common/hadoop-2.4.0/hadoop-2.4.0.tar.gz \ 
+    && wget -O hadoop.tar.gz https://archive.apache.org/dist/hadoop/common/hadoop-2.7.4/hadoop-2.7.4.tar.gz \ 
     && tar -xzf hadoop.tar.gz -C /opt/yarn  && rm hadoop.tar.gz \
     && ln -s /opt/yarn/$HADOOP_PACKAGE /opt/hadoop \
     && groupadd hadoop \
