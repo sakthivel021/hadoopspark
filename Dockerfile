@@ -64,8 +64,10 @@ RUN yum install -y wget \
     && mkdir -p /opt/ \
     && tar xvf spark.tar.gz -C /opt/ \
         && ln -s /opt/$SPARK_PACKAGE /opt/spark \
+	&& chown -R hdfs:hadoop /opt/$SPARK_PACKAGE \
+	&& chown -R hdfs:hadoop /opt/spark \
             &&mkdir /var/log/spark \
-            && chown -R hdfs:haodop /var/log/spark \
+            && chown -R hdfs:hadoop /var/log/spark \
                 && mkdir /tmp/spark \
                     #&& mkdir /etc/spark/ \
                         #&& mv /opt/spark/conf/* /etc/spark/ \

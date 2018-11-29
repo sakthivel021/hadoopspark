@@ -29,4 +29,9 @@
             <value>/var/data/hadoop/hdfs/dn</value>
               <final>true</final>
               </property>
+	<property>
+		<name>dfs.namenode.name.dir</name>
+		<value>/var/data/hadoop/hdfs/nn</value>
+	</property>
+	
 </configuration>
