@@ -3,7 +3,7 @@
 <configuration>
 	<property>
 		<name>yarn.application.classpath</name>
-		<value>/opt/hadoop/etc/hadoop, /opt/hadoop/etc/hadoop/share/hadoop/common/*, /opt/hadoop/share/hadoop/common/lib/*, /opt/hadoop/share/hadoop/hdfs/*, /opt/hadoop/share/hadoop/hdfs/lib/*, /opt/hadoop/share/hadoop/mapreduce/*, /opt/hadoop/share/hadoop/mapreduce/lib/*, /opt/hadoop/share/hadoop/yarn/*, /opt/hadoop/share/hadoop/yarn/lib/*</value>
+		<value>/opt/hadoop/etc/hadoop/:/opt/hadoop/etc/hadoop/share/hadoop/common/*:/opt/hadoop/share/hadoop/common/lib/*:/opt/hadoop/share/hadoop/hdfs/*, /opt/hadoop/share/hadoop/hdfs/lib/*:/opt/hadoop/share/hadoop/mapreduce/*:/opt/hadoop/share/hadoop/mapreduce/lib/*:/opt/hadoop/share/hadoop/yarn/*:/opt/hadoop/share/hadoop/yarn/lib/*:/opt/hadoop/share/hadoop/tools/*</value>
 	</property>
 	<property>
 		<name>yarn.resourcemanager.hostname</name>
@@ -23,7 +23,7 @@
 	</property>
 	<property>
 		<name>yarn.nodemanager.resource.memory-mb</name>
-		<value>4000</value>
+		<value>1536</value>
 	</property>
 	<property>
 		<name>yarn.nodemanager.resource.cpu-vcores</name>
@@ -31,6 +31,10 @@
 	</property>
 	<property>
 		<name>yarn.scheduler.minimum-allocation-mb</name>
-		<value>4000</value>
+		<value>128</value>
 	</property>
+        <property>
+                <name>yarn.scheduler.maximum-allocation-mb</name>
+                <value>1536</value>
+        </property>
 </configuration>

@@ -1,8 +1,7 @@
 FROM centos:6
 volume opt-vol:/opt
-
 ENV SPARK_VERSION 2.4.0
-ENV HADOOP_VERSION 2.7.4
+ENV HADOOP_VERSION 2.4.0
 ENV HADOOP_PACKAGE hadoop-$HADOOP_VERSION
 
 ENV NOTVISIBLE "in users profile"
@@ -29,7 +28,7 @@ run yum install -y openssh-server wget java openssh-clients vim \
   #  && yum install -y pdsh 
 #install Hadoop,Spark
     && mkdir -p /opt/yarn \ 
-    && wget -O hadoop.tar.gz https://archive.apache.org/dist/hadoop/core/hadoop-2.7.4/hadoop-2.7.4.tar.gz \ 
+    && wget -O hadoop.tar.gz https://archive.apache.org/dist/hadoop/common/hadoop-2.4.0/hadoop-2.4.0.tar.gz \ 
     && tar -xzf hadoop.tar.gz -C /opt/yarn  && rm hadoop.tar.gz \
     && ln -s /opt/yarn/$HADOOP_PACKAGE /opt/hadoop \
     && groupadd hadoop \
@@ -115,7 +114,7 @@ ADD slaves $HADOOP_HOME/etc/hadoop/slaves
 
 # update JAVA_HOME and HADOOP_CONF_DIR in hadoop-env.sh
 #RUN sed -i "/^export JAVA_HOME/ s:.*:export JAVA_HOME=${JAVA_HOME}\nexport HADOOP_HOME=${HADOOP_HOME}\nexport HADOOP_PREFIX=${HADOOP_PREFIX}:"  /opt/hadoop/etc/hadoop/hadoop-env.sh
-RUN sed -i '/^export HADOOP_CONF_DIR/ s:.*:export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop/:' /opt/hadoop/etc/hadoop/hadoop-env.sh
+RUN sed -i '/^export HADOOP_CONF_DIR/ s:.*:export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop/:' /opt/hadoop/etc/hadoop/hadoop-env.sh 
 
 EXPOSE 10022:22
 #ENTRYPOINT  [ sh /home/hdfs/deploy_config.sh]
