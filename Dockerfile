@@ -3,6 +3,7 @@ volume opt-vol:/opt
 ENV SPARK_VERSION 2.4.0
 ENV HADOOP_VERSION 2.7.4
 ENV HADOOP_PACKAGE hadoop-$HADOOP_VERSION
+ENV SPARK_HOME=/opt/spark
 
 ENV NOTVISIBLE "in users profile"
 ENV HADOOP_HOME=/opt/hadoop/
@@ -64,13 +65,25 @@ RUN yum install -y wget \
     && tar xvf spark.tar.gz -C /opt/ \
         && ln -s /opt/$SPARK_PACKAGE /opt/spark \
             &&mkdir /var/log/spark \
+            && chown -R hdfs:haodop /var/log/spark \
                 && mkdir /tmp/spark \
-                    && mkdir /etc/spark/ \
-                        && mv /opt/spark/conf/* /etc/spark/ \
-                        && ln -s /etc/spark /opt/spark/conf 
+                    #&& mkdir /etc/spark/ \
+                        #&& mv /opt/spark/conf/* /etc/spark/ \
+                        #&& ln -s /etc/spark /opt/spark/conf \
+#                        && cp /opt/spark/conf/spark-defaults.conf.template /opt/spark/conf/spark-defaults.conf \
+                        && echo "spark.master    yarn" >> /opt/spark/conf/spark-defaults.conf \ 
+                        && echo "spark.driver.memory    512m" >> /opt/spark/conf/spark-defaults.conf \
+                        && echo "spark.executor.memory          512m" >> /opt/spark/conf/spark-defaults.conf \
+                        && echo "spark.eventLog.enabled  true" >> /opt/spark/conf/spark-defaults.conf \
+                        && echo "spark.eventLog.dir /var/log/spark/" >> /opt/spark/conf/spark-defaults.conf \
+                        && echo "spark.history.provider            org.apache.spark.deploy.history.FsHistoryProvider" >> /opt/spark/conf/spark-defaults.conf \
+                        && echo "spark.history.fs.update.interval  10s" >> /opt/spark/conf/spark-defaults.conf \
+                        && echo "spark.history.ui.port             18080" >> /opt/spark/conf/spark-defaults.conf
+
 EXPOSE 4040 
 EXPOSE 7077 
 EXPOSE 8088
+EXPOSE 18080
 #WORKDIR /opt/spark
 
 #SETTING ENVIRONMENT VARIABLES 
@@ -78,8 +91,11 @@ EXPOSE 8088
 RUN  ln -s $HADOOP_HOME/etc/hadoop $HADOOP_HOME/conf \
     && echo "export SPARK_HOME=/opt/spark" >> /etc/profile \
     && echo "export  HADOOP_HOME=/opt/hadoop" >> /etc/profile \
-    && echo "export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin" >> /etc/profile \
+    && echo "export PATH=$PATH:/opt/spark/bin:$HADOOP_HOME/bin:$HADOOP_HOME/sbin" >> /etc/profile \
     && echo "export  JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk.x86_64 " >> /etc/profile \
+    && echo "export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop" >> /etc/profile \
+    && echo "export SPARK_HOME=/opt/spark" >> /etc/profile \
+    && echo "export LD_LIBRARY_PATH=/opt/hadoop/lib/native:$LD_LIBRARY_PATH" >> /etc/profile \
     && echo "export HADOOP_HOME=/opt/hadoop/" >> /opt/hadoop/etc/hadoop/hadoop-env.sh \
     && echo "export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk.x86_64" >> /opt/hadoop/etc/hadoop/hadoop-env.sh \
     && echo "export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop" >> /opt/hadoop/etc/hadoop/hadoop-env.sh \
