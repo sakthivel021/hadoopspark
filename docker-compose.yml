@@ -1,10 +1,11 @@
 version: "3"
 services:
   master:
-    build: .
+    image: hadoopspark:latest
     hostname: hadoop-master
     container_name: namenode
     ports:
+      - "50010:50010"
       - "50020:50020"
       - "50070:50070"
       - "8080:8080"
@@ -17,13 +18,18 @@ services:
       - "19888:19888"
       - "10020:10020"
       - "8030-8050"
-
+      - "65529"
+      - "65530"
+      - "65531"
+    privileged: true
     volumes:
       - "opt-vol:/opt"
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
     links:
       - "slave1:hadoop-slave1"
       - "slave2:hadoop-slave2"
       - "slave3:hadoop-slave3"
+      - "slave4:hadoop-slave4"
    # command: 
   #    - /home/hdfs/deploy_config.sh
  #     - /opt/hadoop/sbin/stop-yarn.sh
@@ -35,15 +41,24 @@ services:
     networks:
       - hadoop
   slave1:
-    build: .
+    #build: .
+    image: hadoopspark:latest
+    #inherits: master
     hostname: hadoop-slave1
     container_name: datanode1
     volumes:
       - "opt-vol:/opt"
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
     ports:
       - "10022:22"
       - "50090:50090"
       - "8030-8050"
+      - "60010:50010"
+      - "8081"
+      - "65529"
+      - "65530"
+      - "65531"
+    privileged: true
     networks:
       - hadoop
  #   command: /usr/sbin/sshd -D
@@ -51,42 +66,88 @@ services:
       - "master:hadoop-master"
       - "slave2:hadoop-slave2"
       - "slave3:hadoop-slave3"
+      - "slave4:hadoop-slave4"
         
   slave2:
-    build: .
+    #build: .
+    image: hadoopspark:latest
+    #inherits: master
     hostname: hadoop-slave2
     container_name: datanode2
     volumes:
       - "opt-vol:/opt"
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
     ports:
-      - "10023:22"
+      - "10030:22"
       - "8030-8050"
+      - "60012:50010"
+      - "8081"
+      - "65529"
+      - "65530"
+      - "65531"
+    privileged: true
     external_links:
       - "master:hadoop-master"
       - "slave1:hadoop-slave1"
       - "slave3:hadoop-slave3"
+      - "slave4:hadoop-slave4"
 
     networks:
       - hadoop
 #    command: /usr/sbin/sshd -D
   slave3:
-    build: . 
+    #build: . 
+    image: hadoopspark:latest
+#    inherits: master
     hostname: hadoop-slave3
     container_name: datanode3
     volumes:
       - "opt-vol:/opt"
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    privileged: true
     networks:
       - hadoop
     ports:
       - "10024:22"
-      - "8030-8050"
+      - "8050-8050"
+      - "60013:50010"
+      - "8081"
+      - "65529"
+      - "65530"
+      - "65531"
     external_links:
       - "master:hadoop-master"
       - "slave1:hadoop-slave1"
       - "slave2:hadoop-slave2"
-
+      - "slave3:hadoop-slave3"
+  slave4:
+    #build: .
+    image: hadoopspark:latest
+#    inherits: master
+    hostname: hadoop-slave4
+    container_name: datanode4
+    volumes:
+      - "opt-vol:/opt"
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    privileged: true
+    networks:
+      - hadoop
+    ports:
+      - "10025:22"
+      - "8030-8050"
+      - "60014:50010"
+      - "8081"
+      - "65529"
+      - "65530"
+      - "65531"
+    external_links:
+      - "master:hadoop-master"
+      - "slave1:hadoop-slave1"
+      - "slave2:hadoop-slave2"
+      - "slave3:hadoop-slave3"
    # command: /usr/sbin/sshd -D
 networks:
   hadoop:
 volumes:
   opt-vol:
+  cgroup:
