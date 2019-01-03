@@ -4,7 +4,7 @@
 <configuration>
   <property>		 
     <name>fs.defaultFS</name>
-    <value>hdfs://hadoop-master:8020</value>
+    <value>hdfs://hadoopcluster</value>
   </property>
   <property>
     <name>fs.default.name</name>
@@ -14,4 +14,8 @@
     <name>topology.script.file.name</name>
     <value>/opt/hadoop/etc/hadoop/topology.sh</value>
     </property>
+      <property>
+   <name>dfs.journalnode.edits.dir</name>
+   <value>/var/data/hadoop/ha/jn</value>
+   </property>
 </configuration>

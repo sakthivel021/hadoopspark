@@ -21,6 +21,11 @@ services:
       - "65529"
       - "65530"
       - "65531"
+      - "9000"
+      - "8485"
+      - "2181:2181"
+      - "3888"
+      - "2888"
     privileged: true
     volumes:
       - "opt-vol:/opt"
@@ -38,6 +43,9 @@ services:
  #     - /opt/hadoop/sbin/start-dfs.sh
  #     - /opt/hadoop/sbin/start-yarn.sh
     #  - /usr/sbin/sshd -D
+    environment:
+       - ZOO_MY_ID:1
+       - ZOO_SERVERS:server.1=0.0.0.0:2888:3888 server.2=hadoop-slave1:2888:3888 server.3=hadoop-slave3:2888:3888
     networks:
       - hadoop
   slave1:
@@ -50,14 +58,31 @@ services:
       - "opt-vol:/opt"
       - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
     ports:
-      - "10022:22"
-      - "50090:50090"
-      - "8030-8050"
       - "60010:50010"
-      - "8081"
+      - "60020:50020"
+      - "60070:50070"
+      - "6080:8080"
+      - "6088:8088"
+      - "6081:8081"
+      - "6077:7077"
+      - "6040:4040"
+      - "6020:8020"
+      - "10022:22"
+      - "29888:19888"
+      - "60021:10020"
+      - "8030-8050"
       - "65529"
       - "65530"
       - "65531"
+      - "9000"
+      - "8485"
+      - "2182:2181"
+      - "3888"
+      - "2888"
+          
+    environment:
+      - ZOO_MY_ID:2
+      - ZOO_SERVERS:server.1=hadoop-master:2888:3888 server.2=0.0.0.0:2888:3888 server.3=hadoop-slave3:2888:3888
     privileged: true
     networks:
       - hadoop
@@ -85,13 +110,21 @@ services:
       - "65529"
       - "65530"
       - "65531"
+      - "9000"
+      - "8485"
+      - "2183:2181"
+      - "3888"
+      - "2888"
+
     privileged: true
     external_links:
       - "master:hadoop-master"
       - "slave1:hadoop-slave1"
       - "slave3:hadoop-slave3"
       - "slave4:hadoop-slave4"
-
+    environment:
+      - ZOO_MY_ID:3
+      - ZOO_SERVERS:server.1=hadoop-master:2888:3888 server.2=hadoop-slave1:2888:3888 server.3=0.0.0.0:2888:3888
     networks:
       - hadoop
 #    command: /usr/sbin/sshd -D
@@ -115,6 +148,12 @@ services:
       - "65529"
       - "65530"
       - "65531"
+      - "9000"
+      - "8485"
+      - "2181"
+      - "3888"
+      - "2888"
+
     external_links:
       - "master:hadoop-master"
       - "slave1:hadoop-slave1"
@@ -140,6 +179,12 @@ services:
       - "65529"
       - "65530"
       - "65531"
+      - "9000"
+      - "8485"
+      - "2181"
+      - "3888"
+      - "2888"
+
     external_links:
       - "master:hadoop-master"
       - "slave1:hadoop-slave1"

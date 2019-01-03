@@ -5,6 +5,7 @@ ENV HADOOP_PACKAGE hadoop-$HADOOP_VERSION
 ENV HADOOP_HOME /opt/hadoop
 ENV SPARK_HOME /opt/spark
 ENV SPARK_PACKAGE spark-${SPARK_VERSION}-bin-hadoop2.7
+ENV ZOOKEEPER_PACKAGE zookeeper-3.4.6
 run yum install -y openssh-server wget java openssh-clients vim java-1.8.0-openjdk-devel; systemctl enable sshd;
 #run systemctl restart sshd.service \
 run echo 'root:$1$NFUWV7nM$L2G0.R82dulmo1m7Szobn/' | chpasswd -e \
@@ -25,6 +26,7 @@ run groupadd hadoop \
     && mkdir -p /var/data/hadoop/hdfs/nn \
     && mkdir -p /var/data/hadoop/hdfs/snn \
     && mkdir /var/data/hadoop/hdfs/dn \
+    && mkdir /var/data/hadoop/zookeeper \
     && mkdir -p /opt/$HADOOP_PACKAGE \
     && ln -s /opt/$HADOOP_PACKAGE /opt/hadoop \
     && mkdir -p $HADOOP_HOME/logs \
@@ -54,14 +56,21 @@ run ls -lh /opt/
 run wget -O /opt/hadoop.tar.gz https://archive.apache.org/dist/hadoop/common/hadoop-2.7.4/hadoop-2.7.4.tar.gz \ 
     && tar -xzf /opt/hadoop.tar.gz -C /opt/  && rm /opt/hadoop.tar.gz 
     #&& ln -s /opt/$HADOOP_PACKAGE /opt/hadoop 
-
+#Install Spark
 RUN wget -O /opt/spark.tar.gz http://apache.volia.net/spark/spark-2.4.0/spark-2.4.0-bin-hadoop2.7.tgz \ 
     ## && mkdir -p /opt/spark \
-    && tar xvf /opt/spark.tar.gz -C /opt 
+    && tar xzf /opt/spark.tar.gz -C /opt 
 RUN ln -sf /opt/$SPARK_PACKAGE /opt/spark \
                     #&& mkdir /etc/spark/ \
                         #&& mv /opt/spark/conf/* /etc/spark/ \
                         && ln -s /etc/spark /opt/spark/conf 
+# Install Zookeeper
+RUN wget -O /opt/zookeeper.tar.gz https://archive.apache.org/dist/zookeeper/zookeeper-3.4.6/zookeeper-3.4.6.tar.gz  \
+    && tar -xvf /opt/zookeeper.tar.gz -C /opt/ \ 
+    && rm /opt/zookeeper.tar.gz
+
+RUN ln -sf /opt/$ZOOKEEPER_PACKAGE /opt/zookeeper \
+    && cp /opt/zookeeper/conf/zoo_sample.cfg /opt/zookeeper/conf/zoo.cfg
 run ls -lh /opt/ \
     && echo "$SPARK_PACKAGE" \
     && ls -lh /opt/spark \
